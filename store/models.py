@@ -1,6 +1,7 @@
 from django.db import models
 
 
+# Todo : Create a model for the store
 # Create your models here.
 
 class Promotion(models.Model):
@@ -10,11 +11,13 @@ class Promotion(models.Model):
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)
-    featured = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
+    featured = models.ForeignKey(
+        'Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField(255)
     description = models.TextField(max_length=1000)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     inventory = models.IntegerField()
@@ -38,7 +41,14 @@ class Customer(models.Model):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
     birth_date = models.DateField(null=True)
-    membership = models.CharField(max_length=17, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
+    membership = models.CharField(
+        max_length=17, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE)
+
+    class Meta:
+        db_table = 'store_customer'
+        indexes = [
+                    models.Index(fields=['last_name', 'first_name']),
+        ]
 
 
 class Order(models.Model):
@@ -60,6 +70,7 @@ class Order(models.Model):
 class Address(models.Model):
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
+    zip = models.CharField(max_length=10)
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
 
 
